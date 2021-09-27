@@ -132,7 +132,7 @@ input[type='checkbox' i] {
 }
 .dashed-loading:after {
   z-index: 10;
-  border: 3px solid yellow;
+  /* border: 3px solid yellow; */
   border-left: 3px solid transparent;
   border-bottom: 3px solid transparent;
   -webkit-animation: dashed 1s ease infinite;
