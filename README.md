@@ -1,9 +1,13 @@
 
-# Apply Yumemi Front-End Coding Test
+# Apply Yumemi TechLead Coding Test
 
+## Programming Language
+ - [Typescript](https://www.typescriptlang.org/)
 ## Framework
  - [ReactJS](https://reactjs.org/)
  - [NextJS](https://nextjs.org/)
+## Testing Frameworkd
+ - [Cypress](https://www.cypress.io/)
 ## Linter & Formatter
  - [Eslint](https://eslint.org/)
  - [Prettier](https://prettier.io/)

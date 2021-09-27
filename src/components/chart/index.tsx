@@ -29,6 +29,7 @@ export default function MyChart() {
           reset: true,
           customIcons: [],
         },
+        autoSelected: 'selection',
       },
     },
     stroke: {
@@ -61,7 +62,7 @@ export default function MyChart() {
       position: 'right',
     },
     title: {
-      text: 'グラフは市町村別の人口推移を表します',
+      text: '市町村別の人口推移を表したグラフ',
       align: 'center',
       margin: 10,
       offsetX: 0,
@@ -163,7 +164,7 @@ export default function MyChart() {
 
   const seriesConverter = (
     prefCode: number,
-    data: [{ year: number; value: number }],
+    data: [{ year: number; value: number }] | never[],
     prefName: string
   ) => {
     const dummyArr: number[] = []
@@ -174,16 +175,21 @@ export default function MyChart() {
   }
   const getPopulation = async (prefCode: number) => {
     const dummyVar = await getPopulationCompitions(prefCode)
-    const data: [{ year: number; value: number }] = dummyVar.data.result.data[0].data
-    return data
+    if (dummyVar.status && dummyVar.data.result.data) {
+      const data: [{ year: number; value: number }] = dummyVar.data.result.data[0].data
+      return data
+    }
+    return []
   }
 
-  const updateXaxisLable = (data: [{ year: number; value: number }]) => {
-    const years: number[] = []
-    data.forEach((element: { year: number }) => {
-      years.push(element.year)
-    })
-    setXaxisCategories(years)
+  const updateXaxisLable = (data: [{ year: number; value: number }] | never[]) => {
+    if (data != []) {
+      const years: number[] = []
+      data.forEach((element: { year: number }) => {
+        years.push(element.year)
+      })
+      setXaxisCategories(years)
+    }
   }
   useEffect(() => {
     async function fetchData() {
@@ -191,7 +197,7 @@ export default function MyChart() {
         const response = await instance.get(endPoints.PREFECTURES)
         if (response.status < 400) {
           const firstPrefecture = response.data.result[0]
-          const data: [{ year: number; value: number }] = await getPopulation(
+          const data: [{ year: number; value: number }] | never[] = await getPopulation(
             firstPrefecture.prefCode
           )
           updateXaxisLable(data)
@@ -201,9 +207,9 @@ export default function MyChart() {
             firstPrefecture.prefName
           )
           setSeries([firstSeries])
+          setPrefectures(response.data.result)
           setLoading(false)
         }
-        setPrefectures(response.data.result)
         return ''
       } catch (error) {
         return error
@@ -222,8 +228,10 @@ export default function MyChart() {
     try {
       const data = await getPopulation(prefCode)
       const newSeries = seriesConverter(prefCode, data, prefName)
-      // setLoading(false)
-      setSeries([...series, newSeries])
+      setLoading(false)
+      if (data != []) {
+        setSeries([...series, newSeries])
+      }
       return ''
     } catch (error) {
       return error
@@ -237,7 +245,7 @@ export default function MyChart() {
     if (!checkStatus) {
       removeSeries(prefCode)
     } else {
-      // setLoading(true)
+      setLoading(true)
       addSeries(prefCode, prefName)
     }
   }
